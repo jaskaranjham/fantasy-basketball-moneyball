@@ -9,7 +9,7 @@ for page_number in range(1, 11):
 
     espn_url = (
         "https://www.espn.com/nba/stats/player/"
-        f"_/page/{page_number}"
+        f"_/season/2026/seasontype/2/page/{page_number}"
     )
 
     tables = pd.read_html(espn_url)
@@ -145,13 +145,6 @@ for contribution in contribution_columns:
 
     percentile_columns.append(percentile_name)
 
-players["Fantasy PPG Percentile"] = (
-    players["Fantasy PPG"]
-    .rank(pct=True)
-    .mul(100)
-    .round(2)
-)
-
 players["Across-the-Board Score"] = (
         4 / sum(
     1 / players[column].clip(lower=1)
@@ -159,8 +152,19 @@ players["Across-the-Board Score"] = (
 )
 ).round(2)
 
+minimum_fppg = players["Fantasy PPG"].min()
+maximum_fppg = players["Fantasy PPG"].max()
+
+players["Production Score"] = (
+        (
+                (players["Fantasy PPG"] - minimum_fppg)
+                / (maximum_fppg - minimum_fppg)
+        )
+        * 100
+).round(2)
+
 players["Maximum Value Score"] = (
-        (players["Fantasy PPG Percentile"] * 0.70)
+        (players["Production Score"] * 0.70)
         + (players["Across-the-Board Score"] * 0.30)
 ).round(2)
 
@@ -191,6 +195,7 @@ columns_to_show = [
     "Fantasy PPG",
     "Maximum Value Score",
     "Across-the-Board Score",
+    "Production Score",
     "Scoring Percentile",
     "Rebounding Percentile",
     "Playmaking Percentile",
