@@ -1,0 +1,12 @@
+# Python virtual environment
+.venv/
+
+# IntelliJ project settings
+.idea/
+
+# Python cache files
+__pycache__/
+*.pyc
+
+# Excel temporary lock files
+~$*.xlsx
